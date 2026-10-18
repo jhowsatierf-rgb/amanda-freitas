@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Amanda Freitas</title>
+<meta name="description" content="Agendamento e controle de caixa">
+<meta name="theme-color" content="#0a5c66">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Amanda Freitas">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@700&family=Nunito:wght@400;700;800&display=swap">
+<style>
+:root{
+  --bg:#eefafa; --card:#ffffff; --ink:#06363d; --muted:#4d7f86;
+  --turq:#1cc3bc; --teal:#0a5c66; --tint:#dff8f6; --line:#c4e9e7;
+  --display:'Playfair Display',Georgia,serif; --body:'Nunito',system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-top:max(20px,env(safe-area-inset-top,0px));
+  padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+[hidden]{display:none!important}
+button,input,select{font:inherit}
+.wrap{max-width:980px;margin:0 auto;display:grid;gap:18px}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between}
+h2{font:700 20px/1.2 var(--display);margin:0 0 12px;color:var(--teal)}
+#app{display:grid;gap:18px}
+.seg{display:inline-flex;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px;justify-self:start}
+.seg button{border:0;background:none;padding:8px 16px;border-radius:999px;font-weight:800;color:var(--muted);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--teal);color:#fff}
+.nav{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:10px}
+.nav .lbl{flex:1;font-weight:800;text-align:center;text-wrap:balance}
+.ibtn{width:42px;height:42px;flex:0 0 42px;border-radius:50%;border:1px solid var(--line);background:var(--tint);color:var(--teal);font-size:22px;line-height:1;cursor:pointer}
+.today{border:0;background:none;color:var(--teal);font-weight:800;cursor:pointer;padding:6px 8px;justify-self:center}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;min-width:0}
+.kpi small{color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.06em;font-size:11px}
+.kpi strong{display:block;font:700 28px/1.2 var(--display);margin-top:6px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.kpi .meta{color:var(--muted)}
+.kpi.recebido strong{color:var(--teal)}
+.kpi.lucro{background:var(--turq);border-color:var(--turq);color:var(--ink)}
+.kpi.lucro small,.kpi.lucro .meta{color:var(--ink)}
+.kpi.lucro small{opacity:.8}
+.kpi.lucro.neg{background:var(--teal);border-color:var(--teal);color:#fff}
+.kpi.lucro.neg small,.kpi.lucro.neg .meta{color:#fff}
+.meta{font-size:13px;margin-top:6px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+@media(max-width:760px){.cols{grid-template-columns:1fr}}
+.list .row{display:flex;align-items:flex-start;gap:12px;padding:14px 0;border-top:1px solid var(--line)}
+.list .row:first-child{border-top:0}
+.time{min-width:58px;text-align:center;background:var(--tint);color:var(--teal);font-weight:800;border-radius:12px;padding:6px 4px;font-variant-numeric:tabular-nums}
+.grow{flex:1;min-width:0}
+.name{font-weight:800;overflow-wrap:anywhere}
+.itens{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:4px}
+.itens li{display:flex;justify-content:space-between;gap:10px;font-size:14px;overflow-wrap:anywhere}
+.itens .v{font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
+.totline{display:flex;justify-content:space-between;gap:10px;margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);font-weight:800;color:var(--teal)}
+.totline .v{font-variant-numeric:tabular-nums;white-space:nowrap}
+.acoes{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.edit,.del{border:0;background:none;cursor:pointer;font-size:12px;padding:4px 6px;white-space:nowrap;font-weight:800;color:var(--teal)}
+.del{color:var(--muted);font-weight:700}
+.del.ask{color:#fff;background:var(--teal);border-radius:999px;padding:4px 10px}
+.empty{color:var(--muted);text-align:center;padding:22px 10px;border:1px dashed var(--line);border-radius:14px}
+.banner{background:var(--tint);color:var(--teal);border-radius:14px;padding:10px 14px;font-weight:700}
+.fab{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:max(16px,env(safe-area-inset-bottom,0px));background:var(--turq);color:var(--ink);border:0;border-radius:999px;padding:14px 22px;font-weight:800;box-shadow:0 10px 24px rgba(28,195,188,.4);cursor:pointer;z-index:5}
+.overlay{position:fixed;inset:0;background:rgba(6,54,61,.35);display:flex;align-items:flex-end;justify-content:center;padding:16px;z-index:10}
+@media(min-width:600px){.overlay{align-items:center}}
+.sheet{background:var(--card);width:100%;max-width:520px;border-radius:24px;padding:22px;max-height:92vh;overflow:auto;display:grid;gap:14px}
+.sheet .seg{justify-self:stretch;display:flex}
+.sheet .seg button{flex:1}
+.campos{display:grid;gap:12px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:420px){.grid2{grid-template-columns:1fr}}
+label{display:grid;gap:6px;font-weight:800;font-size:13px;color:var(--teal)}
+input,select{border:1px solid var(--line);border-radius:12px;padding:11px 12px;background:#fff;color:var(--ink);width:100%;min-width:0;font-size:16px}
+.secao{font-weight:800;font-size:13px;color:var(--teal);margin-top:4px}
+.itens-box{display:grid;gap:8px}
+.item-row{display:grid;grid-template-columns:minmax(0,1fr) 112px 44px;gap:8px;align-items:center}
+.item-row .rem{height:44px;border:1px solid var(--line);background:var(--tint);color:var(--teal);border-radius:12px;font-size:20px;line-height:1;cursor:pointer}
+.addbtn{justify-self:start;border:0;background:none;color:var(--teal);font-weight:800;cursor:pointer;padding:6px 0}
+.totform{font-weight:800;color:var(--teal);text-align:right;font-size:16px;font-variant-numeric:tabular-nums}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.primary,.ghost{border:0;border-radius:14px;padding:13px;font-weight:800;cursor:pointer}
+.primary{background:var(--teal);color:#fff}
+.primary:disabled{opacity:.6;cursor:default}
+.ghost{background:var(--tint);color:var(--teal)}
+.msg{color:var(--teal);font-weight:800;min-height:1.2em;font-size:13px}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.marca{display:grid;justify-items:center;gap:0;width:100%;text-align:center;padding:8px 0 4px}
+.marca .nome{font:400 clamp(52px,11vw,84px)/1.05 'Great Vibes',cursive;color:var(--teal);white-space:nowrap}
+.marca .linha{width:140px;height:3px;background:var(--turq);border-radius:2px;margin:6px 0 8px}
+.marca .desc{font:800 12px 'Nunito',sans-serif;letter-spacing:.16em;color:var(--ink);text-transform:uppercase;opacity:.85}
+.backup p{margin:0 0 12px;color:var(--muted);font-size:14px}
+.backup .btns{max-width:420px}
+.install{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.install .primary{padding:10px 16px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="marca">
+      <div class="nome">Amanda Freitas</div>
+      <div class="linha"></div>
+      <div class="desc">Agendamento e Controle de Caixa</div>
+    </div>
+  </header>
+
+  <div class="banner install" id="installBox" hidden>
+    <span id="installTxt">Instale o app na tela inicial para abrir com um toque.</span>
+    <button type="button" class="primary" id="installBtn" hidden>Instalar</button>
+  </div>
+
+  <div id="app"></div>
+
+  <section class="card backup">
+    <h2>Backup dos dados</h2>
+    <p id="bkInfo">Os registros ficam salvos neste celular. Faça um backup de vez em quando e guarde o arquivo (no WhatsApp, Drive ou e-mail).</p>
+    <div class="btns">
+      <button type="button" class="primary" id="bkSave">Fazer backup</button>
+      <button type="button" class="ghost" id="bkLoad">Restaurar backup</button>
+    </div>
+    <input type="file" id="bkFile" accept="application/json,.json" hidden>
+  </section>
+</div>
+
+<button class="fab" id="openNew" type="button">+ Novo registro</button>
+
+<div class="overlay" id="modal" hidden>
+  <form class="sheet" id="form" novalidate>
+    <h2 id="formTitle">Novo registro</h2>
+    <div class="seg" role="group" aria-label="Tipo de registro" id="tipoSeg">
+      <button type="button" data-tipo="atendimento" aria-pressed="true">Atendimento</button>
+      <button type="button" data-tipo="custo" aria-pressed="false">Custo</button>
+    </div>
+    <div class="campos" id="campos"></div>
+    <div class="msg" id="formMsg"></div>
+    <div class="btns">
+      <button type="button" class="ghost" id="cancel">Cancelar</button>
+      <button type="submit" class="primary" id="salvar">Salvar</button>
+    </div>
+  </form>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const BRL = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+const fmt = v => BRL.format(Number(v) || 0);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad = n => String(n).padStart(2, '0');
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const r2 = n => Math.round(n * 100) / 100;
+const MESES = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const DIAS = ['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
+
+const SERV = {
+  mao: 'Mão', pe: 'Pé', mao_pe: 'Mão e pé',
+  gel_mao: 'Esmaltação gel · mão', gel_pe: 'Esmaltação gel · pé', gel_mao_pe: 'Esmaltação gel · mão e pé',
+  banho_mao: 'Banho de gel · mão', banho_pe: 'Banho de gel · pé', banho_mao_pe: 'Banho de gel · mão e pé',
+  spa_pe: 'Spa dos pés', outro: 'Outro'
+};
+const SERV_GRUPOS = [
+  ['Manicure e pedicure', ['mao', 'pe', 'mao_pe']],
+  ['Esmaltação em gel', ['gel_mao', 'gel_pe', 'gel_mao_pe']],
+  ['Banho de gel', ['banho_mao', 'banho_pe', 'banho_mao_pe']],
+  ['Spa e outros', ['spa_pe', 'outro']]
+];
+const optLabel = k => SERV[k].includes(' · ') ? SERV[k].split(' · ')[1] : SERV[k];
+const servOptions = sel => SERV_GRUPOS.map(([g, ks]) =>
+  `<optgroup label="${g}">${ks.map(k => `<option value="${k}" ${k === sel ? 'selected' : ''}>${optLabel(k)}</option>`).join('')}</optgroup>`
+).join('');
+
+const CATS = ['Equipamento', 'Produtos', 'Aluguel', 'Energia e água', 'Transporte', 'Outros'];
+const VIEWS = { dia: 'Dia', semana: 'Semana', mes: 'Mês' };
+
+// ---------- armazenamento local (no próprio celular) ----------
+const KEY = 'af_dados_v1';
+const KEY_BK = 'af_ultimo_backup';
+const COLS = ['agendamentos', 'custos'];
+const novoId = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
+
+const store = {
+  ok: true,
+  data: { agendamentos: [], custos: [] },
+  load() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (raw) {
+        const d = JSON.parse(raw);
+        COLS.forEach(c => { this.data[c] = Array.isArray(d[c]) ? d[c] : []; });
+      }
+    } catch (e) { this.ok = false; }
+  },
+  persist() {
+    try { localStorage.setItem(KEY, JSON.stringify(this.data)); return true; }
+    catch (e) { return false; }
+  },
+  add(col, doc) { this.data[col].push({ id: novoId(), ...doc, criadoEm: new Date().toISOString() }); return this.persist(); },
+  update(col, id, doc) {
+    const i = this.data[col].findIndex(r => r.id === id);
+    if (i < 0) return false;
+    this.data[col][i] = { ...this.data[col][i], ...doc, alteradoEm: new Date().toISOString() };
+    return this.persist();
+  },
+  remove(col, id) { this.data[col] = this.data[col].filter(r => r.id !== id); return this.persist(); }
+};
+
+const S = { view: 'dia', ref: new Date(), confirm: null, tipo: 'atendimento', err: '', editing: null };
+const ags = () => store.data.agendamentos;
+const custos = () => store.data.custos;
+
+// ---------- itens ----------
+const itensAg = x => Array.isArray(x.itens) ? x.itens : [{ servico: x.servico || 'outro', valor: Number(x.valor) || 0 }];
+const itensCu = x => Array.isArray(x.itens) ? x.itens : [{ descricao: x.descricao || 'Item', valor: Number(x.valor) || 0 }];
+const totalItens = itens => r2(itens.reduce((t, i) => t + (Number(i.valor) || 0), 0));
+const totalAg = x => totalItens(itensAg(x));
+const totalCu = x => totalItens(itensCu(x));
+
+// ---------- datas ----------
+const iso = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const parseIso = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+
+function range() {
+  const r = S.ref;
+  if (S.view === 'dia') return [iso(r), iso(r)];
+  if (S.view === 'semana') {
+    const dow = (r.getDay() + 6) % 7;
+    const mon = addDays(r, -dow);
+    return [iso(mon), iso(addDays(mon, 6))];
+  }
+  return [iso(new Date(r.getFullYear(), r.getMonth(), 1)), iso(new Date(r.getFullYear(), r.getMonth() + 1, 0))];
+}
+
+function label() {
+  const r = S.ref;
+  if (S.view === 'dia') return `${DIAS[r.getDay()]}, ${r.getDate()} de ${MESES[r.getMonth()]} de ${r.getFullYear()}`;
+  if (S.view === 'mes') return `${cap(MESES[r.getMonth()])} de ${r.getFullYear()}`;
+  const [a, b] = range();
+  const A = parseIso(a), B = parseIso(b);
+  return A.getMonth() === B.getMonth()
+    ? `${A.getDate()} a ${B.getDate()} de ${MESES[B.getMonth()]}`
+    : `${A.getDate()} de ${MESES[A.getMonth()]} a ${B.getDate()} de ${MESES[B.getMonth()]}`;
+}
+
+function shift(n) {
+  const r = S.ref;
+  if (S.view === 'dia') S.ref = addDays(r, n);
+  else if (S.view === 'semana') S.ref = addDays(r, 7 * n);
+  else S.ref = new Date(r.getFullYear(), r.getMonth() + n, 1);
+}
+
+const shortDate = s => { const [, m, d] = s.split('-'); return `${d}/${m}`; };
+const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
+
+// ---------- render ----------
+function render() {
+  const [a, b] = range();
+  const lAg = ags()
+    .filter(x => x.data >= a && x.data <= b)
+    .sort((x, y) => (x.data + ' ' + (x.hora || '')).localeCompare(y.data + ' ' + (y.hora || '')));
+  const lCu = custos()
+    .filter(x => x.data >= a && x.data <= b)
+    .sort((x, y) => x.data.localeCompare(y.data));
+
+  const rec = lAg.reduce((t, x) => t + totalAg(x), 0);
+  const gas = lCu.reduce((t, x) => t + totalCu(x), 0);
+  const luc = rec - gas;
+  const margem = rec > 0 ? Math.round((luc / rec) * 100) : null;
+
+  const cont = {};
+  lAg.forEach(x => itensAg(x).forEach(i => { const k = i.servico || 'outro'; cont[k] = (cont[k] || 0) + 1; }));
+  const servStr = Object.entries(cont).filter(([, n]) => n > 0)
+    .map(([k, n]) => `${n} ${SERV[k] || k}`).join(' · ');
+
+  const showDate = S.view !== 'dia';
+
+  const acoes = (col, id) => {
+    const asking = S.confirm === col + ':' + id;
+    return `<div class="acoes">
+      <button class="edit" type="button" data-act="edit" data-col="${col}" data-id="${esc(id)}">Editar</button>
+      <button class="del ${asking ? 'ask' : ''}" type="button" data-act="del" data-col="${col}" data-id="${esc(id)}">${asking ? 'Confirmar' : 'Apagar'}</button>
+    </div>`;
+  };
+
+  const agRows = lAg.map(x => {
+    const itens = itensAg(x);
+    return `
+    <div class="row">
+      <div class="time">${esc(x.hora || '--:--')}${showDate ? `<div style="font-size:11px;font-weight:700">${shortDate(x.data)}</div>` : ''}</div>
+      <div class="grow">
+        <div class="name">${esc(x.cliente)}</div>
+        <ul class="itens">
+          ${itens.map(i => `<li><span>${esc(SERV[i.servico] || i.servico || 'Serviço')}</span><span class="v">${fmt(i.valor)}</span></li>`).join('')}
+        </ul>
+        <div class="totline"><span>Total do atendimento</span><span class="v">${fmt(totalItens(itens))}</span></div>
+      </div>
+      ${acoes('agendamentos', x.id)}
+    </div>`;
+  }).join('');
+
+  const cuRows = lCu.map(x => {
+    const itens = itensCu(x);
+    return `
+    <div class="row">
+      <div class="time" style="font-size:11px">${shortDate(x.data)}</div>
+      <div class="grow">
+        <div class="name">${esc(x.categoria || 'Compra')}</div>
+        <ul class="itens">
+          ${itens.map(i => `<li><span>${esc(i.descricao || 'Item')}</span><span class="v">${fmt(i.valor)}</span></li>`).join('')}
+        </ul>
+        <div class="totline"><span>Total da compra</span><span class="v">${fmt(totalItens(itens))}</span></div>
+      </div>
+      ${acoes('custos', x.id)}
+    </div>`;
+  }).join('');
+
+  const banners = [];
+  if (!store.ok) banners.push('Não foi possível acessar o armazenamento do celular. Os registros podem não ser salvos.');
+  if (S.err) banners.push(S.err);
+  const lembrete = lembreteBackup();
+  if (lembrete) banners.push(lembrete);
+
+  $('#app').innerHTML = `
+    <div class="seg" role="group" aria-label="Período">
+      ${Object.entries(VIEWS).map(([k, v]) => `<button type="button" data-view="${k}" aria-pressed="${S.view === k}">${v}</button>`).join('')}
+    </div>
+
+    <div class="nav">
+      <button class="ibtn" type="button" data-nav="-1" aria-label="Anterior">‹</button>
+      <div class="lbl">${esc(label())}</div>
+      <button class="ibtn" type="button" data-nav="1" aria-label="Próximo">›</button>
+    </div>
+    <button class="today" type="button" data-act="hoje">Ir para hoje</button>
+
+    ${banners.map(t => `<div class="banner">${esc(t)}</div>`).join('')}
+
+    <div class="cards">
+      <div class="card kpi recebido">
+        <small>Recebido</small>
+        <strong>${fmt(rec)}</strong>
+        <div class="meta">${plural(lAg.length, 'atendimento')}${servStr ? ' · ' + esc(servStr) : ''}</div>
+      </div>
+      <div class="card kpi gasto">
+        <small>Gastos</small>
+        <strong>${fmt(gas)}</strong>
+        <div class="meta">${plural(lCu.length, 'compra')}</div>
+      </div>
+      <div class="card kpi lucro ${luc < 0 ? 'neg' : ''}">
+        <small>Lucro</small>
+        <strong>${fmt(luc)}</strong>
+        <div class="meta">${margem === null ? 'Sem recebimentos no período' : `Margem de ${margem}%`}</div>
+      </div>
+    </div>
+
+    <div class="cols">
+      <section class="card">
+        <h2>Atendimentos</h2>
+        <div class="list">
+          ${agRows || `<div class="empty">Nenhum atendimento neste período.<br>Use “+ Novo registro” para agendar.</div>`}
+        </div>
+      </section>
+      <section class="card">
+        <h2>Custos</h2>
+        <div class="list">
+          ${cuRows || `<div class="empty">Nenhum custo neste período.<br>Registre as compras com cada item e seu preço.</div>`}
+        </div>
+      </section>
+    </div>`;
+  infoBackup();
+}
+
+const ERR_SALVAR = 'Não foi possível salvar no celular. O armazenamento pode estar cheio.';
+
+// ---------- cliques na lista ----------
+$('#app').addEventListener('click', e => {
+  const v = e.target.closest('[data-view]');
+  if (v) { S.view = v.dataset.view; render(); return; }
+  const n = e.target.closest('[data-nav]');
+  if (n) { shift(Number(n.dataset.nav)); render(); return; }
+  const act = e.target.closest('[data-act]');
+  if (!act) return;
+
+  if (act.dataset.act === 'hoje') { S.ref = new Date(); render(); return; }
+
+  if (act.dataset.act === 'edit') {
+    const rec = store.data[act.dataset.col].find(r => r.id === act.dataset.id);
+    if (rec) openModal(rec, act.dataset.col);
+    return;
+  }
+
+  if (act.dataset.act === 'del') {
+    const k = act.dataset.col + ':' + act.dataset.id;
+    if (S.confirm !== k) { S.confirm = k; render(); return; }
+    S.confirm = null;
+    S.err = store.remove(act.dataset.col, act.dataset.id) ? '' : ERR_SALVAR;
+    render();
+  }
+});
+
+// ---------- formulário ----------
+function parseValor(s) {
+  let t = String(s || '').trim();
+  if (t.includes(',')) t = t.replace(/\./g, '').replace(',', '.');
+  const n = Number(t);
+  return Number.isFinite(n) && n >= 0 ? r2(n) : NaN;
+}
+
+const linhaItem = (tipo, v = {}) => {
+  const valStr = v.valor != null ? String(v.valor).replace('.', ',') : '';
+  if (tipo === 'atendimento') return `
+    <div class="item-row">
+      <select name="iserv" aria-label="Serviço">${servOptions(v.servico || 'mao')}</select>
+      <input name="ival" inputmode="decimal" placeholder="0,00" aria-label="Valor" value="${valStr}">
+      <button type="button" class="rem" aria-label="Remover item">×</button>
+    </div>`;
+  return `
+    <div class="item-row">
+      <input name="idesc" maxlength="80" autocomplete="off" placeholder="Ex.: Esmalte" aria-label="Nome do item" value="${esc(v.descricao || '')}">
+      <input name="ival" inputmode="decimal" placeholder="0,00" aria-label="Valor" value="${valStr}">
+      <button type="button" class="rem" aria-label="Remover item">×</button>
+    </div>`;
+};
+
+function atualizaTotal() {
+  const t = [...document.querySelectorAll('#itensBox [name="ival"]')]
+    .reduce((acc, el) => { const n = parseValor(el.value); return acc + (Number.isFinite(n) ? n : 0); }, 0);
+  $('#totForm').textContent = `Total: ${fmt(r2(t))}`;
+}
+
+function drawCampos(v = {}, itens = []) {
+  document.querySelectorAll('#tipoSeg button').forEach(b =>
+    b.setAttribute('aria-pressed', String(b.dataset.tipo === S.tipo)));
+  const base = S.view === 'dia' ? S.ref : new Date();
+  const now = new Date();
+  const horaAgora = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  const ehAg = S.tipo === 'atendimento';
+  const lista = itens.length ? itens : [{}];
+
+  $('#campos').innerHTML = ehAg ? `
+    <div class="grid2">
+      <label>Data<input type="date" name="data" required value="${esc(v.data || iso(base))}"></label>
+      <label>Horário<input type="time" name="hora" required value="${esc(v.hora || horaAgora)}"></label>
+    </div>
+    <label>Cliente<input name="cliente" required maxlength="80" autocomplete="off" placeholder="Nome da cliente" value="${esc(v.cliente || '')}"></label>
+    <div class="secao">Serviços feitos nesse atendimento</div>
+    <div class="itens-box" id="itensBox">${lista.map(i => linhaItem('atendimento', i)).join('')}</div>
+    <button type="button" class="addbtn" id="addItem">+ Adicionar serviço</button>
+    <div class="totform" id="totForm"></div>
+  ` : `
+    <div class="grid2">
+      <label>Data<input type="date" name="data" required value="${esc(v.data || iso(base))}"></label>
+      <label>Categoria<select name="categoria">${CATS.map(c => `<option ${c === (v.categoria || 'Outros') ? 'selected' : ''}>${c}</option>`).join('')}</select></label>
+    </div>
+    <div class="secao">Itens comprados</div>
+    <div class="itens-box" id="itensBox">${lista.map(i => linhaItem('custo', i)).join('')}</div>
+    <button type="button" class="addbtn" id="addItem">+ Adicionar item</button>
+    <div class="totform" id="totForm"></div>
+  `;
+  atualizaTotal();
+}
+
+function openModal(rec, col) {
+  S.editing = rec ? { col, id: rec.id } : null;
+  S.tipo = rec ? (col === 'custos' ? 'custo' : 'atendimento') : 'atendimento';
+  $('#formTitle').textContent = rec ? 'Editar registro' : 'Novo registro';
+  $('#tipoSeg').hidden = !!rec;
+  $('#salvar').textContent = rec ? 'Salvar alterações' : 'Salvar';
+  $('#formMsg').textContent = '';
+  if (rec) drawCampos(rec, col === 'custos' ? itensCu(rec) : itensAg(rec));
+  else drawCampos({}, []);
+  $('#modal').hidden = false;
+}
+
+function closeModal() { S.editing = null; $('#modal').hidden = true; }
+
+$('#openNew').addEventListener('click', () => openModal(null));
+$('#cancel').addEventListener('click', closeModal);
+$('#modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
+$('#tipoSeg').addEventListener('click', e => {
+  const b = e.target.closest('[data-tipo]');
+  if (!b) return;
+  S.tipo = b.dataset.tipo;
+  drawCampos({}, []);
+});
+
+$('#campos').addEventListener('click', e => {
+  if (e.target.closest('#addItem')) {
+    $('#itensBox').insertAdjacentHTML('beforeend', linhaItem(S.tipo === 'atendimento' ? 'atendimento' : 'custo', {}));
+    atualizaTotal();
+    return;
+  }
+  const rem = e.target.closest('.rem');
+  if (rem) { rem.closest('.item-row').remove(); atualizaTotal(); }
+});
+$('#campos').addEventListener('input', e => { if (e.target.name === 'ival') atualizaTotal(); });
+
+$('#form').addEventListener('submit', e => {
+  e.preventDefault();
+  const f = new FormData(e.target);
+  const msg = t => { $('#formMsg').textContent = t; };
+  const data = String(f.get('data') || '');
+  if (!data) { msg('Informe a data.'); return; }
+
+  const col = S.editing ? S.editing.col : (S.tipo === 'atendimento' ? 'agendamentos' : 'custos');
+  const rows = [...document.querySelectorAll('#itensBox .item-row')];
+  const itens = [];
+  for (const r of rows) {
+    const valor = parseValor(r.querySelector('[name="ival"]').value);
+    if (!Number.isFinite(valor)) { msg('Confira os valores dos itens.'); return; }
+    if (col === 'agendamentos') {
+      itens.push({ servico: r.querySelector('[name="iserv"]').value, valor });
+    } else {
+      const descricao = r.querySelector('[name="idesc"]').value.trim();
+      if (!descricao) { msg('Informe o nome de cada item comprado.'); return; }
+      itens.push({ descricao, valor });
+    }
+  }
+  if (!itens.length) { msg(col === 'agendamentos' ? 'Adicione pelo menos um serviço.' : 'Adicione pelo menos um item.'); return; }
+
+  let doc;
+  if (col === 'agendamentos') {
+    const cliente = String(f.get('cliente') || '').trim();
+    if (!cliente) { msg('Informe o nome da cliente.'); return; }
+    doc = { data, hora: String(f.get('hora') || ''), cliente, itens, valor: totalItens(itens) };
+  } else {
+    doc = { data, categoria: String(f.get('categoria') || 'Outros'), itens, valor: totalItens(itens) };
+  }
+
+  const ok = S.editing ? store.update(col, S.editing.id, doc) : store.add(col, doc);
+  if (!ok) { msg(ERR_SALVAR); return; }
+  const [a, b] = range();
+  if (data < a || data > b) S.ref = parseIso(data);
+  S.err = '';
+  closeModal();
+  render();
+});
+
+// ---------- backup e restauração ----------
+function ultimoBackup() { try { return localStorage.getItem(KEY_BK); } catch (e) { return null; } }
+function totalRegistros() { return ags().length + custos().length; }
+
+function lembreteBackup() {
+  if (totalRegistros() === 0) return '';
+  const u = ultimoBackup();
+  const dias = u ? (Date.now() - new Date(u).getTime()) / 864e5 : Infinity;
+  if (dias < 7) return '';
+  return u ? 'Faz mais de uma semana desde o último backup. Role até o fim e toque em “Fazer backup”.'
+           : 'Você ainda não fez nenhum backup. Role até o fim e toque em “Fazer backup”.';
+}
+
+function infoBackup() {
+  const u = ultimoBackup();
+  const base = 'Os registros ficam salvos neste celular. Faça um backup de vez em quando e guarde o arquivo (no WhatsApp, Drive ou e-mail).';
+  $('#bkInfo').textContent = u
+    ? `${base} Último backup: ${new Date(u).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}.`
+    : base;
+}
+
+$('#bkSave').addEventListener('click', async () => {
+  const hoje = iso(new Date());
+  const nome = `backup-amanda-freitas-${hoje}.json`;
+  const json = JSON.stringify({ app: 'amanda-freitas', versao: 1, exportadoEm: new Date().toISOString(), ...store.data }, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  let feito = false;
+  try {
+    const file = new File([blob], nome, { type: 'application/json' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: 'Backup Amanda Freitas' });
+      feito = true;
+    }
+  } catch (e) {
+    if (e && e.name === 'AbortError') return;
+  }
+  if (!feito) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = nome;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  }
+  try { localStorage.setItem(KEY_BK, new Date().toISOString()); } catch (e) {}
+  render();
+});
+
+$('#bkLoad').addEventListener('click', () => $('#bkFile').click());
+$('#bkFile').addEventListener('change', async e => {
+  const file = e.target.files[0];
+  e.target.value = '';
+  if (!file) return;
+  try {
+    const d = JSON.parse(await file.text());
+    if (!Array.isArray(d.agendamentos) || !Array.isArray(d.custos)) throw new Error('formato');
+    const resumo = `${plural(d.agendamentos.length, 'atendimento')} e ${plural(d.custos.length, 'custo')}`;
+    if (!confirm(`Restaurar este backup (${resumo})?\n\nOs registros atuais deste celular serão substituídos.`)) return;
+    store.data = { agendamentos: d.agendamentos, custos: d.custos };
+    S.err = store.persist() ? '' : ERR_SALVAR;
+    if (!S.err) alert('Backup restaurado.');
+    render();
+  } catch (err) {
+    alert('Esse arquivo não parece ser um backup deste app.');
+  }
+});
+
+// ---------- instalação ----------
+const standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+let promptInstall = null;
+if (!standalone) {
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    promptInstall = e;
+    $('#installTxt').textContent = 'Instale o app na tela inicial para abrir com um toque.';
+    $('#installBtn').hidden = false;
+    $('#installBox').hidden = false;
+  });
+  if (isIOS) {
+    $('#installTxt').textContent = 'Para instalar: toque em Compartilhar (quadrado com seta) e depois em “Adicionar à Tela de Início”.';
+    $('#installBox').hidden = false;
+  }
+}
+$('#installBtn').addEventListener('click', async () => {
+  if (!promptInstall) return;
+  promptInstall.prompt();
+  await promptInstall.userChoice;
+  promptInstall = null;
+  $('#installBox').hidden = true;
+});
+window.addEventListener('appinstalled', () => { $('#installBox').hidden = true; });
+
+// ---------- início ----------
+store.load();
+if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+// Atualiza quando volta para o app em outro dia
+document.addEventListener('visibilitychange', () => { if (!document.hidden) render(); });
+render();
+</script>
+</body>
+</html>
